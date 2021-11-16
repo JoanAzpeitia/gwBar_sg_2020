@@ -1,0 +1,179 @@
+# Copyright (c) 2015 Shotgun Software Inc.
+#
+# CONFIDENTIAL AND PROPRIETARY
+#
+# This work is provided "AS IS" and subject to the Shotgun Pipeline Toolkit
+# Source Code License included in this distribution package. See LICENSE.
+# By accessing, using, copying or modifying this work you indicate your
+# agreement to the Shotgun Pipeline Toolkit Source Code License. All rights
+# not expressly granted therein are reserved by Shotgun Software Inc.
+
+#
+# This file is one of the central points in the Shotgun Pipeline Toolkit configuration and
+# a counterpart to the folder configuration structure.
+#
+# The folder structure underneath the project folder is used to create folders on disk -
+# templates.yml (this file) refers to those folders. Therefore, the two files need to be
+# in sync. This file contains an overview of all locations that are used by Sgtk.
+#
+# Whenever an app or an engine refers to a location on disk, it is using an entry defined in
+# this file. For more information, see the Shotgun Pipeline Toolkit Documentation.
+
+
+
+#
+# The keys section contains the definitions for all the different keys that are being
+# used by Sgtk. A key is a magic token that is replaced by a value at runtime, for example
+# {Shot}. The section below tells Sgtk which data types and formats to expect for each key.
+#
+keys:
+    Sequence:
+        type: str
+    Shot:
+        type: str
+    Step:
+        type: str
+    sg_asset_type:
+        type: str
+    Asset:
+        type: str
+    name:
+        type: str
+        filter_by: "[a-zA-Z0-9_]"
+    nameAllValues:
+        type: str
+        filter_by: "[a-zA-Z0-9_]"
+    iteration:
+        type: int
+    version:
+        type: int
+        format_spec: "03"
+    version_four:
+       type: int
+       format_spec: "04"
+       alias: version
+    timestamp:
+        type: str
+    width:
+        type: int
+    height:
+        type: int
+    grp_name:
+        type: str
+
+    # Represents the optional output name for frames written by the Shotgun Write Node
+    nuke.output:
+        alias: output
+        type: str
+        filter_by: alphanumeric
+
+    SEQ:
+        type: sequence
+        format_spec: "04"
+
+#
+# The paths section contains all the the key locations where files are to be stored
+# by Sgtk Apps. Each path is made up of several keys (like {version} or {shot}) and
+# these are defined in the keys section above.
+#
+# Apps use these paths as part of their configuration to define where on disk
+# different files should go.
+#
+
+paths:
+
+    # Common  path definitions to use as shorthand in order to avoid repetitive and verbose
+    # templates. This also makes it easy to change any of the common root paths and have the
+    # changes apply to all templates that use them.
+    #
+    # These don't require the standard formatting (with definition and root_name) because they
+    # will be set within each template that uses the alias.
+    shot_root: films/{Sequence}/shots/{Shot}/
+
+    ##########################################################################################
+    # Shot level paths
+
+    plate1:
+        definition: '@shot_root/plates/Plate1/{nameAllValues}.{SEQ}.dpx'
+        root_name: 'primary'
+    plate2:
+        definition: '@shot_root/plates/Plate2/{nameAllValues}.{SEQ}.dpx'
+        root_name: 'primary'
+    plate3:
+        definition: '@shot_root/plates/Plate3/{nameAllValues}.{SEQ}.dpx'
+        root_name: 'primary'
+    plate4:
+        definition: '@shot_root/plates/Plate4/{nameAllValues}.{SEQ}.dpx'
+        root_name: 'primary'
+
+
+    #
+    # Nuke
+    #
+
+
+    # define the location of a work area
+    shot_work_area_nuke:
+        definition: '@shot_root/comp_scripts/nuke'
+    # define the location of a publish area
+    shot_publish_area_nuke:
+        definition: '@shot_root/publish/nuke'
+    # The location of WIP script files
+    nuke_shot_work:
+        definition: '@shot_root/comp_scripts/nuke/{Shot}.v{version}.nk'
+    # The location of backups of WIP files
+    # nuke_shot_snapshot:
+    #    definition: '@shot_root/work/nuke/snapshots/{name}.v{version}.{timestamp}.nk'
+    # The location of published nuke script files
+    nuke_shot_publish:
+        definition: '@shot_root/publish/nuke/{Shot}.v{version}.nk'
+
+    # Write node outputs, render, elements, denoise and quicktime
+    nuke_shot_render_dpx:
+        definition: '@shot_root/comps/{Shot}_v{version}/{Shot}_v{version}.{SEQ}.dpx'
+    nuke_shot_render_elements_dpx:
+        definition: '@shot_root/renders/precomps_nuke/{nuke.output}/v{version}/{Shot}_{nuke.output}_v{version}.{SEQ}.dpx'
+        root_name: 'primary'
+    nuke_shot_render_mono_denoise_dpx:
+        definition: '@shot_root/plates/denoise/{nuke.output}/v{version}/{Shot}_{nuke.output}_v{version}.{SEQ}.dpx'
+        root_name: 'primary'
+    nuke_shot_render_jpg:
+        definition: '@shot_root/renders/precomps_nuke/{Shot}_v{version}/{nuke.output}.{SEQ}.jpg'
+        root_name: 'primary'
+
+    # review output
+    shot_quicktime_quick:
+        definition: '@shot_root/review/quickdaily/{Shot}_{name}_{iteration}.mov'
+    nuke_shot_render_movie:
+        definition: '@shot_root/comps/{Shot}_v{version}.mov'
+
+    # quicktime from edit
+    edit_quicktime:
+        definition: '@shot_root/plates/editQuicktime/{nameAllValues}.mov'
+
+    # shot specific lut
+    shot_lut:
+        definition: '@shot_root/luts/{nameAllValues}.cube'
+
+    nuke_shot_snapshot:
+        definition: '@shot_root/snapshots/{name}.v{version}.{timestamp}.nk'
+        root_name: 'primary'
+
+
+#
+# The strings section is similar to the paths section - but rather than defining paths
+# on disk, it contains a list of strings. Strings are typically used when you want to be
+# able to configure the way data is written to shotgun - it may be the name field for a
+# review version or the formatting of a publish.
+#
+
+strings:
+
+    # when a review Version in Shotgun is created inside of Nuke, this is the
+    # name that is being given to it (the code field)
+    nuke_shot_version_name: "{Shot}_{name}_{nuke.output}_v{version}.{iteration}"
+    nuke_quick_shot_version_name: "{Shot}_{name}_quick_{iteration}"
+
+    nuke_asset_version_name: "{Asset}_{name}_{nuke.output}_v{version}.{iteration}"
+    nuke_quick_asset_version_name: "{Asset}_{name}_quick_{iteration}"
+

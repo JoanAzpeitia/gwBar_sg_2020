@@ -1,0 +1,10 @@
+# Shotgun Pipeline Toolkit configuration file
+# This file was automatically created by setup_project
+# This file reflects the paths in the primary pipeline
+# configuration defined for this project.
+
+Windows: '\\sloth\2d_share\shotgunPipelineConfigurations\centauro_0136'
+Darwin: '//Volumes/2d_share/shotgunPipelineConfigurations/centauro_0136'
+Linux: '/barcelonafs/2d_share/shotgunPipelineConfigurations/centauro_0136'
+
+# End of file.
